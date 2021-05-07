@@ -7,18 +7,19 @@ class Application
     if req.path.match(/test/) 
       return [200, { 'Content-Type' => 'application/json' }, [ {:message => "test response!"}.to_json ]]
     elsif req.path.match(/dogs/)
-      if req.env["REQUEST_METHOD"] == "POST" # CREATE Dog
+      case req.env["REQUEST_METHOD"]
+      when "POST" # CREATE Dog
         input = JSON.parse(req.body.read)
         owner_id = req.path.split("/owners/").last.split("/dogs").last
         owner = Owner.find_by(id: owner_id)
         dog = owner.dogs.create(name: input["name"])
         return [200, { 'Content-Type' => 'application/json' }, [ dog.to_json ]]
-      elsif req.env["REQUEST_METHOD"] == "DELETE" # DELETE Dog
+      when "DELETE" # DELETE Dog
         owner_id = req.path.split("/owners/").last.split("/dogs/").first
         owner = Owner.find_by(id: owner_id)
         dog_id = req.path.split("/owners/").last.split("/dogs/").last
         owner.dogs.delete(Dog.find_by(id: dog_id))
-      elsif req.env["REQUEST_METHOD"] == "PATCH" # PATCH
+      when "PATCH" # PATCH
         owner_id = req.path.split("/owners/").last
         owner = Owner.find_by(id: owner_id)
         input = JSON.parse(req.body.read)
@@ -27,6 +28,26 @@ class Application
         dog.update(input)
         return [200, { 'Content-Type' => 'application/json' }, [ dog.to_json ]]
       end
+      # if req.env["REQUEST_METHOD"] == "POST" # CREATE Dog
+      #   input = JSON.parse(req.body.read)
+      #   owner_id = req.path.split("/owners/").last.split("/dogs").last
+      #   owner = Owner.find_by(id: owner_id)
+      #   dog = owner.dogs.create(name: input["name"])
+      #   return [200, { 'Content-Type' => 'application/json' }, [ dog.to_json ]]
+      # elsif req.env["REQUEST_METHOD"] == "DELETE" # DELETE Dog
+      #   owner_id = req.path.split("/owners/").last.split("/dogs/").first
+      #   owner = Owner.find_by(id: owner_id)
+      #   dog_id = req.path.split("/owners/").last.split("/dogs/").last
+      #   owner.dogs.delete(Dog.find_by(id: dog_id))
+      # elsif req.env["REQUEST_METHOD"] == "PATCH" # PATCH
+      #   owner_id = req.path.split("/owners/").last
+      #   owner = Owner.find_by(id: owner_id)
+      #   input = JSON.parse(req.body.read)
+      #   dog_id = req.path.split("/owners/").last.split("/dogs/").last
+      #   dog = owner.dogs.find_by(id: dog_id)
+      #   dog.update(input)
+      #   return [200, { 'Content-Type' => 'application/json' }, [ dog.to_json ]]
+      # end
     elsif req.path.match(/owners/)
       if req.env["REQUEST_METHOD"] == "POST" # CREATE Owner
         input = JSON.parse(req.body.read)
