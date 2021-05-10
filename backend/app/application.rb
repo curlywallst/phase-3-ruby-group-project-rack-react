@@ -20,7 +20,7 @@ class Application
         dog_id = req.path.split("/owners/").last.split("/dogs/").last
         owner.dogs.delete(Dog.find_by(id: dog_id))
       when "PATCH" # PATCH
-        owner_id = req.path.split("/owners/").last
+        owner_id = req.path.split("/owners/").last.split("/dogs/").first
         owner = Owner.find_by(id: owner_id)
         input = JSON.parse(req.body.read)
         dog_id = req.path.split("/owners/").last.split("/dogs/").last
